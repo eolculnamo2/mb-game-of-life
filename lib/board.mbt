@@ -19,10 +19,9 @@ fn generate_double() -> Double {
   }
 }
 
-fn init_cells(self: Board) -> Array[Cell] {
+fn init_cells() -> Array[Cell] {
   let mut live_cells_left = initial_cell_count
 
-  // bummer that this doesnt need mut keyword! :(
   let cells: Array[Cell] = []
 
   let mut placement = 0 
@@ -41,7 +40,7 @@ fn init_cells(self: Board) -> Array[Cell] {
 
   while live_cells_left > 0 {
     let i = (generate_double() * cells.length().to_double()).to_int()
-    let result = cells.get(i).map(fn (c) {
+    let _ = cells.get(i).map(fn (c) {
         c.is_alive = true
     })
     live_cells_left-=1
@@ -51,59 +50,27 @@ fn init_cells(self: Board) -> Array[Cell] {
 
 pub fn play_generation(self: Board) -> Unit {
   let new_cells = self.cells.map(fn(c) {
+    let neighbor_count = [
+        c.placement - board_size - 1, // TOP_LEFT
+        c.placement - board_size,  // TOP_CENTER
+        c.placement - board_size + 1, // TOP_RIGHT
+        c.placement - 1, // LEFT
+        c.placement + 1, // RIGHT
+        c.placement + board_size - 1, // BOTTOM_LEFT
+        c.placement + board_size, // BOTTOM_CENTER
+        c.placement + board_size + 1, // BOTTOM_RIGHT
+    ].fold_left(~init=0, fn (sum, cell_index) {
+        let is_neighbor_alive = self.cells.get(cell_index).map_or(false, fn(c) {
+          c.is_alive
+        })
+        if is_neighbor_alive {
+          sum + 1
+        } else{ 
+          sum
+        }
+    })
 
-    // TODO this next
-    let mut neighbor_count = 0
-    let top_left= self.cells.get(c.placement - board_size - 1).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let top_center= self.cells.get(c.placement - board_size).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let top_right= self.cells.get(c.placement - board_size + 1).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let right = self.cells.get(c.placement - 1).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let left = self.cells.get(c.placement + 1).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let bottom_left = self.cells.get(c.placement + board_size - 1).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let bottom_center = self.cells.get(c.placement + board_size).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-    let bottom_right = self.cells.get(c.placement + board_size + 1).map_or(false, fn(c) {
-      if c.is_alive {
-        neighbor_count += 1
-      }
-      c.is_alive
-    })
-      // are when/if clauses supported? 
-     let will_live = match (neighbor_count, c.is_alive) {
+    let will_live = match (neighbor_count, c.is_alive) {
       (2 | 3, true) => true
       (3, false) =>  true
       _ => false
@@ -127,7 +94,7 @@ pub fn Board::make() -> Board {
     can_click: true,
     time: { current_frame: 0  },
    }
-   let initialized_cells = init_cells(board)
+   let initialized_cells = init_cells()
 
    {..board, cells: initialized_cells }
 }

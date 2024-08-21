@@ -1,5 +1,6 @@
+pub let cell_size = 8
+// pub let cell_size = 10
 // pub let cell_size = 16
-pub let cell_size = 10
 pub let number_of_pixels = 160
 pub let speed = 10
 
