@@ -1,4 +1,3 @@
-// increasing this number too much causes an error
 let r: @random.RandomState = @random.init_state(~seed=1000)
 pub struct BoardTime {
   // increases each time update function is called (at 60 hz)

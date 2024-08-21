@@ -1,3 +1,4 @@
+// decreasing this number too much causes an error (because it causes more cells)
 pub let cell_size = 8
 // pub let cell_size = 10
 // pub let cell_size = 16
